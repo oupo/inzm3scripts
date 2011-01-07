@@ -30,6 +30,7 @@ end
 
 def dump_for_js
 	maps = []
+	# 「"商店街",20」のようにマップ名のエンカウントインデックスの対応を書いたファイル
 	open("mapname-encount.txt", "rb:cp932") do |f|
 		f.each_line do |line|
 			next if line.chomp == ""

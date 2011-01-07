@@ -26,11 +26,18 @@ end
 
 reverse_unitno.each_with_index do |ids, i|
 	unless ids
-		puts "#{i}: none"
+		puts "none"
 		next
 	end
-	puts "%d: %s" % [i, ids.map{|id|
+	
+	next if i == 0
+	puts get_cstr(unitbase_dat[ids[0]], 28)
+end
+
+if false
+reverse_unitno.each_with_index do |ids, i|
+	puts "%d: [%s]" % [i, ids.map{|id|
 		unitbase_dat[id] ? "%s (%d)" % [get_cstr(unitbase_dat[id], 28), id] : id
 	}.join(",")]
 end
-
+end

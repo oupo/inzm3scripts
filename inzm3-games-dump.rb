@@ -26,7 +26,7 @@ def dump_games
 
 	team_pkh = open("team.pkh", "rb") {|f|
 		f.pos = 48
-		f.read(clbonus_dat.size * 4).unpack("V*")
+		f.read.unpack("V*")
 	}
 
 	item_names = decode_file("item.dat", 44).map{|b| get_cstr(b, 0) }
@@ -36,30 +36,29 @@ def dump_games
 	games_dat.each_with_index do |b, pos|
 		team_id = read_short(b, 0)
 		team_index = team_pkh.index(team_id)
-		next unless team_index
 		base_level = read_byte(b, 3)
 		
-		clbonus_ids = [read_short(b, 0xc)]
+		clbonus_id = read_short(b, 0xc)
+		clbonus = read_clbonus(clbonus_dat[clbonus_id], item_names)
 		
-		team = team_pkb[team_index]
-		team_name = get_cstr(team, 0)
 		
-		team_unit_names = []
-		16.times do |i|
-			unitno = read_short(team, 0x40 + i * 8)
-			next if unitno == 0
-			team_unit_names << unitno_to_name[unitno]
+		if team_index
+			team = team_pkb[team_index]
+			team_name = get_cstr(team, 0)
+			
+			team_unit_names = []
+			16.times do |i|
+				unitno = read_short(team, 0x40 + i * 8)
+				next if unitno == 0
+				team_unit_names << unitno_to_name[unitno]
+			end
+		else
+			team_name = nil
+			team_unit_names = nil
 		end
 		
-		#puts [team_name, items, item_odds, exp, nekketu, yuujou, base_level, team_unit_names].inspect
-		puts "%d: %s(%d), %d, %p" % [pos, team_name, team_id, base_level, team_unit_names]
-		
-		clbonus_ids.each do |id|
-			clbonus = read_clbonus(clbonus_dat[id], item_names)
-			puts "clbonus#%d: %s, %p" % [id, "[%s]" % clbonus.items.map{|(n,o)| "#{n}(#{o})"}.join(", "), [clbonus.exp, clbonus.nekketu, clbonus.yuujou]]
-		end
-		
-		# puts dump_binary_long(b)
+		items, item_odds = clbonus.items.transpose
+		puts [team_name, items, item_odds, clbonus.exp, clbonus.nekketu, clbonus.yuujou, base_level, team_unit_names].inspect
 	end
 end
 

@@ -17,9 +17,8 @@ team_pkb.each do |b|
 	teams_long[team_id] = b
 end
 
-teams_long.each_with_index do |b, pos|
+team_pkb.each_with_index do |b, pos|
 	#puts "#{b ? get_cstr(b) : "nil"}"; next
-	next unless b
 	name = get_cstr(b)
 	team_id = read_short(b, 0x20)
 	r = []
@@ -29,7 +28,7 @@ teams_long.each_with_index do |b, pos|
 		next if unitno == 0
 		r << "%s %s" % [unitno_to_name[unitno], dump_binary(b[0x40 + i * 8 + 2, 6])]
 	end
-	puts "#{name}: #{team_id}"
-	puts r.join("\n")
-	puts
+	puts "#{team_id}: #{name} (team.pkb index = #{pos})"
+	#puts r.join("\n")
+	#puts
 end

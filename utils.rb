@@ -81,11 +81,12 @@ def dump_binary_long(buf)
 end
 
 def dump_binary_with_ruler(binary)
-	puts "    " + (0..15).map{|i| "%02x" % i }.join(" ")
+	r = "    " + (0..15).map{|i| "%02x" % i }.join(" ") + "\n"
 	binary.bytes.each_slice(16).with_index do |line, i|
-		print "%02x| " % (i * 16)
-		puts line.map {|byte| "%02x" % byte }.join(" ")
+		r << "%02x| " % (i * 16)
+		r << line.map {|byte| "%02x" % byte }.join(" ") + "\n"
 	end
+	r
 end
 
 def search_binary_offset(binaries, intsize)

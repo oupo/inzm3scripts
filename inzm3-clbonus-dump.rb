@@ -1,10 +1,11 @@
 #!ruby
 # encoding: cp932
 require_relative "utils.rb"
+require_relative "inzm3-data-decode.rb"
 
 
 clbonus = open("clbonus.dat", "rb"){|f| f.read }
-item_names = open("item-names.txt", "rb:cp932"){|f| f.read.lines.map{|i| i.chomp} }
+item_names = decode_file("item.dat", 44).map{|b| get_cstr(b, 0) }
 
 (clbonus.size / 24).times do |pos|
 	b = clbonus[pos*24, 24]
