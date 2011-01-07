@@ -87,5 +87,5 @@ unitbase.size.times do |pos|
 	
 	bytes = get_bytes(b, [[4,4], [12,4], [18,2], [22,2], [26,2], [30,2], [34,2], [38,2], [42,2], [62,10]])
 	
-	puts ["%4d" % unitno, ljust(name, 10), gp, tp, kick, body, ctrl, guard, speed, stamina, guts, free_val, waza, zokusei_names[zokusei] || zokusei, way_scout].join("\t")
+	puts ["%4d" % unitno, sjis_ljust(name, 10), gp, tp, kick, body, ctrl, guard, speed, stamina, guts, free_val, waza, zokusei_names[zokusei] || zokusei, way_scout].join("\t")
 end

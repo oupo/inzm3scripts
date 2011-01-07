@@ -19,7 +19,7 @@ def unitno_to_name(unitno)
 	get_cstr(base, 28)
 end
 
-num_machine = 12
+num_machine = 15
 num_color = 3
 
 cupsule_type_to_unitno = Array.new(num_machine+1) { Array.new(num_color) { [] } }
@@ -27,7 +27,7 @@ cupsule_type_to_unitno = Array.new(num_machine+1) { Array.new(num_color) { [] } 
 	unitno = read16(b, 0x24)
 	jointype = read8(b, 0x26)
 	
-	next unless (11..129).include?(jointype)
+	next unless (11..159).include?(jointype)
 	machineno = jointype / 10
 	if jointype % 10 == 0
 		raise "jointype = %d, unit = %s" % [jointype, unitno_to_name(unitno)]
