@@ -1,6 +1,6 @@
 #!ruby
 # encoding: cp932
-require_relative "binary.rb"
+require_relative "utils.rb"
 
 # マップ名の文字列プールへのオフセットがどっかにないか探してみたけど見当たらなかった
 def search_string_offset
@@ -41,7 +41,7 @@ end
 # eve.pkb内の各ファイルの構造は調べてないのでいい加減
 def dump_mapname_encount
 	mapnames = {}
-	open("SCRIPTINFOMAP.TXT", "rb") do |f|
+	open("SCRIPTINFOMAP.TXT", "rb:c932") do |f|
 		f.each_line do |line|
 			/^(\w+)\.mbld, (.+)$/ =~ line.chomp
 			mapnames[$1] = $2
