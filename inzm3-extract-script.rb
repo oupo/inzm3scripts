@@ -52,26 +52,30 @@ def extract_bytes(src)
 	dest
 end
 
-EvePkhEntry = Struct.new(:value, :pkb_pos, :pkb_length)
+PkhEntry = Struct.new(:value, :pkb_pos, :pkb_length)
 
-def read_eve_pkh(binary)
+def read_pkh(binary)
 	length = read16(binary, 22)
 	result = []
 	length.times do |i|
 		pos = 48 + i * 12
-		result << EvePkhEntry.new(read32(binary, pos), read32(binary, pos + 4), read32(binary, pos + 8))
+		result << PkhEntry.new(read32(binary, pos), read32(binary, pos + 4), read32(binary, pos + 8))
 	end
 	result
 end
 
-eve_pkh = read_eve_pkh(open("eve.pkh", "rb"){|f| f.read})
-eve_pkb = open("eve.pkb", "rb"){|f| f.read}
+["eve", "mch"].each do |fname|
+	pkh = read_pkh(open("#{fname}.pkh", "rb"){|f| f.read})
+	pkb = open("#{fname}.pkb", "rb"){|f| f.read}
 
-eve_pkh.each do |e|
-	path = "eve.pkh-dump/%.8x" % e.value
-	open(path, "wb") do |f|
-		src = eve_pkb[e.pkb_pos, e.pkb_length]
-		f.write extract_bytes(src)
+	dirname = fname
+	Dir.mkdir dirname if not File.directory?(dirname)
+	pkh.each do |e|
+		path = "#{dirname}/#{fname}%d.sst" % e.value
+		open(path, "wb") do |f|
+			src = pkb[e.pkb_pos, e.pkb_length]
+			f.write extract_bytes(src)
+		end
+		puts "extracted #{path}"
 	end
-	puts "extracted #{path}"
 end
