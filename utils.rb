@@ -69,6 +69,10 @@ def read_slice(path, block_size)
 	result
 end
 
+def readfile(path)
+	open(path, "rb"){|f| f.read }
+end
+
 def dump_binary(bytes)
 	bytes = bytes.bytes if bytes.respond_to?(:bytes)
 	bytes.map{|i|"%.2x" % i}.join(" ")
