@@ -23,7 +23,8 @@ def dump_ambiguous_units()
 	
 	name_to_units.each do |name, unitnos|
 		bools = unitnos.map {|unitno| hastalkfile?(unitno) }
-		if bools.include?(true) and bools.include?(false)
+			if bools.include?(true) and bools.include?(false) and
+			   not (bools.count(false) == 1 and not can_scout(unitnos[bools.index(false)]))
 			print "#{name}: "
 			puts unitnos.map {|unitno| [unitno, hastalkfile?(unitno), get_way_scout(unitno)] }.inspect
 		end
@@ -33,23 +34,31 @@ end
 def dump_for_js()
 	name_to_units = gen_name_to_units()
 	
-	unitnames1 = []
-	unitnames2 = []
+	unitnames_hastalkfile = []
+	unitnames_nothastalkfile = []
 	
 	
 	name_to_units.each do |name, unitnos|
 		bools = unitnos.map {|unitno| hastalkfile?(unitno) }
-		if bools.all? {|x| x == true }
-			unitnames1 << name
-		elsif bools.all? {|x| x == false }
-			unitnames2 << name
+		if bools.include?(true)
+			if bools.include?(false) and
+			   not (bools.count(false) == 1 and not can_scout(unitnos[bools.index(false)]))
+				$stderr.puts "ambiguous unit: #{name}"
+			end
+			hastalkfile = true
 		else
-			$stderr.puts "ambiguous unit: #{name}"
+			hastalkfile = false
 		end
+		
+		if unitnos.any?{|unitno| not can_scout(unitno) }
+			$stderr.puts "can't scout: #{name} #{hastalkfile}"
+		end
+		
+		(hastalkfile ? unitnames_hastalkfile : unitnames_nothastalkfile) << name
 	end
 	
-	puts "var UNITNAME_RE_HASTALKFILE = /^#{regexp_asseble(unitnames1)}$/;"
-	puts "var UNITNAME_RE_NOTHASTALKFILE = /^#{regexp_asseble(unitnames2)}$/;"
+	puts "var UNITNAME_RE_HASTALKFILE = /^#{regexp_asseble(unitnames_hastalkfile)}$/;"
+	puts "var UNITNAME_RE_NOTHASTALKFILE = /^#{regexp_asseble(unitnames_nothastalkfile)}$/;"
 end
 
 def regexp_asseble(strs)
@@ -70,9 +79,13 @@ def gen_name_to_units()
 		unitno = read_short(b, 0x4e)
 		name = get_cstr(b, 28)
 		next if unitno == 0
-		next if (3931..3946).include?(unitno) # 鬼道ホワイツ、円堂レッズの選手たちを除外
-		next if get_way_scout(unitno) == 252 # 仲間不可を除外
 		(result[name] ||= []).push(unitno)
 	end
 	result
+end
+
+def can_scout(unitno)
+		return false if (3931..3946).include?(unitno) # 鬼道ホワイツ、円堂レッズの選手たち
+		return false if get_way_scout(unitno) == 252 # 仲間不可
+		true
 end
