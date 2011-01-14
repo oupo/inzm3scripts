@@ -98,6 +98,7 @@ def search_binary_offset(binaries, intsize)
 	hit = Array.new(binaries[0].size / int_bytesize, true)
 	binaries.each_with_index do |binary, index|
 		expected = yield(index)
+		next unless expected
 		(binary.size / int_bytesize).times do |i|
 			byte = send("read#{intsize}", binary, i * int_bytesize)
 			if byte != expected
