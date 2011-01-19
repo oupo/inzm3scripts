@@ -68,3 +68,35 @@ def read_pkh(binary)
 	end
 	result
 end
+
+def init_item_names
+	return if @item_names
+	@item_names = decode_file("item.dat", 44).map{|b| get_cstr(b, 0) }
+end
+
+def get_item_name(item_id)
+	init_item_names()
+	@item_names[item_id]
+end
+
+def init_games
+	return if @games_dat
+	@games_dat = read_slice("games.dat", 48)
+	@team_pkb = read_slice("team.pkb", 352)
+
+	@team_pkh = open("team.pkh", "rb") {|f|
+		f.pos = 48
+		f.read.unpack("V*")
+	}
+end
+
+def game_id_to_team_name(game_id)
+	init_games()
+	game = @games_dat[game_id]
+	team_id = read_short(game, 0)
+	team_index = @team_pkh.index(team_id)
+	team = @team_pkb[team_index]
+	
+	get_cstr(team, 0)
+end
+
